@@ -1,0 +1,76 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'jetty'
+apply plugin: 'war'
+
+idea {
+    project {
+        ext.languageLevel = '1.6'
+        ext.jdkName = '1.6'
+    }
+}
+repositories {
+
+    mavenCentral()
+    maven {
+        url "http://repo.springsource.org/plugins-release/"
+    }
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+dependencies {
+    compile 'org.projectlombok:lombok:0.10.8',
+            'commons-io:commons-io:2.4',
+            'org.springframework:spring-webmvc:3.1.1.RELEASE',
+            'org.springframework:spring-core:3.1.1.RELEASE',
+            'org.springframework:spring-web:3.1.1.RELEASE',
+            'org.codehaus.jackson:jackson-mapper-asl:1.9.9',
+            'org.springframework.security:spring-security-taglibs:3.1.2.RELEASE',
+            'org.json:json:20090211',
+            'org.aspectj:aspectjweaver:1.7.0',
+            'cglib:cglib:2.2.2'
+
+    testCompile 'junit:junit:4.8.2',
+            'org.mockito:mockito-all:1.9.5',
+            'org.hamcrest:hamcrest-all:1.3',
+            'cglib:cglib:2.2.2',
+            'org.powermock:powermock-mockito-release-full:1.5',
+            'com.natpryce:make-it-easy:3.1.0',
+            'org.springframework:spring-test:3.1.1.RELEASE',
+            'org.springframework:spring-test-mvc:1.0.0.M1'
+}
+
+//task jettyRunWarDaemon(dependsOn: war)
+
+//jettyRunWarDaemon.doFirst {
+//    jettyRunWar.daemon = true
+//    jettyRunWar.httpPort = 9091
+//    jettyRunWar.contextPath = ''
+//    jettyRunWar.execute()
+//}
+//
+//task jettyRunWarLocal(dependsOn: war)
+//
+//jettyRunWarLocal.doFirst {
+//    jettyRunWar.daemon = false
+//    jettyRunWar.httpPort = 9091
+//    jettyRunWar.execute()
+//    jettyRunWar.contextPath = ''
+//}
+
+jettyRun {
+    jettyRun.httpPort = 8080
+    contextPath = ''
+    jettyRun.scanIntervalSeconds = 1
+    System.properties.get('environmentName', 'local')
+}
+
+task run(dependsOn: jettyRun)
+
+task explodedWar(type: Copy) {
+    into "$buildDir/exploded"
+    with war
+}
